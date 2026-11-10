@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RehabTrack</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      padding: 25px;
+      color: #1e293b;
+    }
+    main {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+    }
+    h1 { color: #087f70; }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+    }
+    button {
+      background: #087f70;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    li { margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>RehabTrack</h1>
+    <p>Rehabilitation Exercise Tracker</p>
+
+    <h2>Add an Exercise</h2>
+    <input id="exercise" placeholder="Exercise name">
+    <input id="reps" type="number" min="1"
+           placeholder="Repetitions">
+    <button onclick="addExercise()">Add Exercise</button>
+
+    <h2>Exercise List</h2>
+    <ul id="exerciseList"></ul>
+
+    <h3 id="progress">Completed: 0 of 0</h3>
+  </main>
+
+  <script>
+    let exercises = JSON.parse(
+      localStorage.getItem("exercises") || "[]"
+    );
+
+    function save() {
+      localStorage.setItem(
+        "exercises", JSON.stringify(exercises)
+      );
+    }
+
+    function addExercise() {
+      const name = document.getElementById("exercise").value.trim();
+      const reps = Number(document.getElementById("reps").value);
+
+      if (!name || !Number.isInteger(reps) || reps < 1) {
+        alert("Enter an exercise and valid repetitions.");
+        return;
+      }
+
+      exercises.push({ name, reps, done: false });
+      save();
+      render();
+
+      document.getElementById("exercise").value = "";
+      document.getElementById("reps").value = "";
+    }
+
+    function toggleExercise(index) {
+      exercises[index].done = !exercises[index].done;
+      save();
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById("exerciseList");
+      list.replaceChildren();
+
+      exercises.forEach((exercise, index) => {
+        const item = document.createElement("li");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = exercise.done;
+        checkbox.addEventListener("change", () => {
+          toggleExercise(index);
+        });
+
+        item.append(
+          checkbox,
+          document.createTextNode(
+            `${exercise.name} - ${exercise.reps} reps`
+          )
+        );
+        list.appendChild(item);
+      });
+
+      const completed = exercises.filter(e => e.done).length;
+      document.getElementById("progress").textContent =
+        `Completed: ${completed} of ${exercises.length}`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
