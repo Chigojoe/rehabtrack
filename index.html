@@ -48,6 +48,7 @@
     <ul id="exerciseList"></ul>
 
     <h3 id="progress">Completed: 0 of 0</h3>
+    <progress id="progressBar" value="0" max="100"></progress>
   </main>
 
   <script>
@@ -109,6 +110,11 @@
       const completed = exercises.filter(e => e.done).length;
       document.getElementById("progress").textContent =
         `Completed: ${completed} of ${exercises.length}`;
+      const percentage = exercises.length
+  ? (completed / exercises.length) * 100
+  : 0;
+
+document.getElementById("progressBar").value = percentage;
     }
 
     render();
